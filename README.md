@@ -21,6 +21,7 @@ The service listens on `PORT` (default `3000`) and exposes:
 
 - `GET /webhook`: Meta webhook verification
 - `POST /webhook`: incoming WhatsApp events
+- `GET /health`: deployment health check
 - `GET /privacy`: public privacy policy page for Meta app settings
 
 For the first smoke test, the bot replies with a confirmation message. Product
