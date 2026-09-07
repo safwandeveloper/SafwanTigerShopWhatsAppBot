@@ -25,6 +25,7 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
   );
 
   if (!response.ok) {
-    throw new Error(`WhatsApp API returned HTTP ${response.status}`);
+    const errorBody = await response.text();
+    throw new Error(`WhatsApp API returned HTTP ${response.status}: ${errorBody.slice(0, 1_000)}`);
   }
 }
