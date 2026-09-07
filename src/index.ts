@@ -3,6 +3,12 @@ import { config } from './config.js';
 import { handleWebhook } from './webhook.js';
 
 const server = http.createServer((req, res) => {
+  if (req.url?.split('?')[0] === '/health') {
+    res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' });
+    res.end('ok');
+    return;
+  }
+
   if (req.url?.split('?')[0] === '/privacy') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(
