@@ -43,11 +43,23 @@ export async function sendMainMenu(to: string): Promise<void> {
     type: 'interactive',
     interactive: {
       type: 'list',
-      header: { type: 'text', text: 'Welcome to SafwanTiger Shop!' },
-      body: { text: 'Choose an option from the menu below.' },
+      header: { type: 'text', text: 'SafwanTiger Shop' },
+      body: {
+        text: '👋 *Welcome to SafwanTiger Shop*\n\nPremium digital products, delivered instantly.\n_Secure payments • 24/7 support_\n\nTap the button below to open the menu.',
+      },
+      footer: { text: 'SafwanTiger Shop • Trusted since day one' },
       action: {
-        button: 'Main Menu',
-        sections: [{ title: 'SafwanTiger Shop', rows: MAIN_MENU_ROWS }],
+        button: 'Open Menu',
+        sections: [
+          {
+            title: 'Store',
+            rows: MAIN_MENU_ROWS.slice(0, 3),
+          },
+          {
+            title: 'Help & More',
+            rows: MAIN_MENU_ROWS.slice(3),
+          },
+        ],
       },
     },
   });
@@ -59,12 +71,18 @@ export async function sendMenuReply(to: string, body: string): Promise<void> {
     type: 'interactive',
     interactive: {
       type: 'button',
+      header: { type: 'text', text: 'SafwanTiger Shop' },
       body: { text: body },
+      footer: { text: 'Need help? Tap Support anytime.' },
       action: {
         buttons: [
           {
             type: 'reply',
-            reply: { id: 'menu:main', title: '⬅️ Main Menu' },
+            reply: { id: 'menu:main', title: '🏠 Main Menu' },
+          },
+          {
+            type: 'reply',
+            reply: { id: 'menu:support', title: '💬 Support' },
           },
         ],
       },
