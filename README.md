@@ -24,8 +24,8 @@ The service listens on `PORT` (default `3000`) and exposes:
 - `GET /health`: deployment health check
 - `GET /privacy`: public privacy policy page for Meta app settings
 
-For the first smoke test, the bot replies with a confirmation message. Product
-catalog, inventory, payments, and delivery are not connected yet.
+Text messages open the WhatsApp main menu. Menu items return placeholder replies
+until the product catalog, inventory, payments, and delivery are wired up.
 
 ## Meta configuration
 
