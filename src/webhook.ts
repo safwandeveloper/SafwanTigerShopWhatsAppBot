@@ -1,6 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
-import { getAdminData, recordCustomer } from './data.js';
+import {
+  getAdminData,
+  getCustomer,
+  getCustomerDeposits,
+  getCustomerMenuView,
+  getCustomerOrders,
+  recordCustomer,
+  setCustomerMenuView,
+  type MenuView,
+} from './data.js';
 import { adminMenuId, commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
 import {
   sendAdminCommands,
@@ -12,6 +21,10 @@ import {
   sendAdminSettings,
   sendAdminSupport,
   sendCommandsReply,
+  sendDepositHistory,
+  sendMenuViewMenu,
+  sendOrderHistory,
+  sendSettingsMenu,
   sendLiveSupportPrompt,
   sendMainMenu,
   sendMenuReply,
@@ -155,16 +168,35 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         if (id === 'menu:more') {
           await sendMoreMenu(message.from);
         } else if (id === 'menu:main' || !reply) {
-          await sendMainMenu(message.from);
+          await sendMainMenu(message.from, await getCustomerMenuView(message.from));
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
+        } else if (id === 'menu:profile') {
+          await sendSettingsMenu(message.from, await getCustomer(message.from));
         } else if (id === 'menu:commands') {
           await sendCommandsReply(message.from, reply);
         } else {
           await sendMenuReply(message.from, reply);
         }
       } else if (message.id === 'menu:main') {
-        await sendMainMenu(message.from);
+        await sendMainMenu(message.from, await getCustomerMenuView(message.from));
+      } else if (message.from !== config.adminPhoneNumber && message.id === 'menu:profile') {
+        await sendSettingsMenu(message.from, await getCustomer(message.from));
+      } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:view') {
+        await sendMenuViewMenu(message.from, await getCustomerMenuView(message.from));
+      } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:orders') {
+        await sendOrderHistory(message.from, await getCustomerOrders(message.from));
+      } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:deposits') {
+        await sendDepositHistory(message.from, await getCustomerDeposits(message.from));
+      } else if (message.from !== config.adminPhoneNumber && (message.id === 'settings:view:buttons' || message.id === 'settings:view:list')) {
+        const view: MenuView = message.id.endsWith(':list') ? 'list' : 'buttons';
+        try {
+          await setCustomerMenuView(message.from, view);
+          await sendMainMenu(message.from, view);
+        } catch (error) {
+          console.error('WhatsApp menu view update failed', error);
+          await sendTextMessage(message.from, 'Menu view storage is not configured yet. Please try again after setup.');
+        }
       } else if (message.from === config.adminPhoneNumber && message.id.startsWith('admin:')) {
         if (message.id === 'admin:main') {
           await sendAdminMenu(message.from);
