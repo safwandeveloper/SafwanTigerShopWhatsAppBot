@@ -38,6 +38,7 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
 }
 
 export async function sendMainMenu(to: string, menuView: MenuView = 'list', balance = 0): Promise<void> {
+  const balanceText = `$${balance.toFixed(2)}`;
   if (menuView === 'list') {
     await postMessage({
       to,
@@ -45,7 +46,7 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'list', bala
       interactive: {
         type: 'list',
         header: { type: 'text', text: 'SafwanTiger Shop' },
-        body: { text: `*Welcome to SafwanTiger Shop!*\n\nWallet balance: ${balance}\n\nChoose an option below.` },
+        body: { text: `👋 *Welcome to SafwanTiger Shop!*\n\n💳 Your balance: ${balanceText}` },
         action: {
           button: 'Open Menu',
           sections: [
@@ -71,7 +72,7 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'list', bala
     });
     return;
   }
-  await sendMenuReply(to, `*Welcome to SafwanTiger Shop!*\n\nWallet balance: ${balance}`, [
+  await sendMenuReply(to, `👋 *Welcome to SafwanTiger Shop!*\n\n💳 Your balance: ${balanceText}`, [
     { id: 'menu:shop', title: 'Shop' },
     { id: 'menu:topup', title: 'Top-up' },
     { id: 'menu:more', title: 'More' },
@@ -156,7 +157,7 @@ export async function sendMoreMenu(to: string): Promise<void> {
 }
 
 export async function sendMenuReply(to: string, body: string, buttons?: Array<{ id: string; title: string }>): Promise<void> {
-  const defaultButtons = [{ id: 'menu:main', title: '→' }];
+  const defaultButtons = [{ id: 'menu:main', title: 'Back' }];
   const safeButtons = (buttons ?? defaultButtons).slice(0, 3).map((b) => ({
     type: 'reply' as const,
     reply: { id: b.id, title: b.title },
@@ -252,7 +253,7 @@ export async function sendAdminCommands(to: string): Promise<void> {
 }
 
 export async function sendCommandsReply(to: string, body: string): Promise<void> {
-  await sendMenuReply(to, body, [{ id: 'menu:main', title: '→' }]);
+  await sendMenuReply(to, body, [{ id: 'menu:main', title: 'Back' }]);
 }
 
 export async function sendSupportReply(to: string): Promise<void> {
