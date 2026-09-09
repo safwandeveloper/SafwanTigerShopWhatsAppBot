@@ -6,6 +6,7 @@ import {
   sendLiveSupportPrompt,
   sendMainMenu,
   sendMenuReply,
+  sendMoreMenu,
   sendSupportReply,
   sendTextMessage,
 } from './whatsapp.js';
@@ -132,7 +133,9 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
           return;
         }
         const reply = id ? menuReplyText(id) : null;
-        if (id === 'menu:main' || !reply) {
+        if (id === 'menu:more') {
+          await sendMoreMenu(message.from);
+        } else if (id === 'menu:main' || !reply) {
           await sendMainMenu(message.from);
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
@@ -145,7 +148,9 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         await sendMainMenu(message.from);
       } else {
         const reply = menuReplyText(message.id);
-        if (message.id === 'menu:support') {
+        if (message.id === 'menu:more') {
+          await sendMoreMenu(message.from);
+        } else if (message.id === 'menu:support') {
           await sendSupportReply(message.from);
         } else if (message.id === 'menu:commands' && reply) {
           await sendCommandsReply(message.from, reply);

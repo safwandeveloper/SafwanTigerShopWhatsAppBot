@@ -76,7 +76,7 @@ export function menuReplyText(id: string): string | null {
     case 'menu:topup':
       return config.topupResponse;
     case 'menu:profile':
-      return '⚙️ *My Account*\n\nOrders, balance and settings will appear here soon.';
+      return '*Settings*\n\n*Profile*\nYour WhatsApp account details.\n\n*Wallet*\nView your balance and manage deposits.\n\n*Orders*\nAccess your digital purchases and delivery status.\n\n*Referrals*\nInvite friends and track your rewards.\n\nYour account tools will be available here as each feature is enabled.';
     case 'menu:support':
       return '💬 *Support*\n\nOur team is here for you. Choose Telegram Support for direct contact, or start a live chat here and describe your issue.';
     case 'menu:live_support':

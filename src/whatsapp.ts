@@ -1,5 +1,4 @@
 import { config } from './config.js';
-import { MAIN_MENU_ROWS } from './menu.js';
 
 async function postMessage(payload: Record<string, unknown>): Promise<void> {
   if (!config.accessToken || !config.phoneNumberId) {
@@ -38,31 +37,19 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
 }
 
 export async function sendMainMenu(to: string): Promise<void> {
-  await postMessage({
-    to,
-    type: 'interactive',
-    interactive: {
-      type: 'list',
-      header: { type: 'text', text: 'SafwanTiger Shop' },
-      body: {
-        text: '👋 *Welcome to SafwanTiger Shop*\n\nPremium digital products, delivered instantly.\n_Secure payments • 24/7 support_\n\nTap the button below to open the menu.',
-      },
-      footer: { text: 'SafwanTiger Shop • Trusted since day one' },
-      action: {
-        button: 'Open Menu',
-        sections: [
-          {
-            title: 'Store',
-            rows: MAIN_MENU_ROWS.slice(0, 3),
-          },
-          {
-            title: 'Help & More',
-            rows: MAIN_MENU_ROWS.slice(3),
-          },
-        ],
-      },
-    },
-  });
+  await sendMenuReply(to, '*Welcome to SafwanTiger Shop*', [
+    { id: 'menu:shop', title: 'Shop' },
+    { id: 'menu:topup', title: 'Top-up' },
+    { id: 'menu:more', title: 'More' },
+  ]);
+}
+
+export async function sendMoreMenu(to: string): Promise<void> {
+  await sendMenuReply(to, '*SafwanTiger Shop*\n\nChoose an option:', [
+    { id: 'menu:profile', title: 'Settings' },
+    { id: 'menu:support', title: 'Support' },
+    { id: 'menu:main', title: 'Back' },
+  ]);
 }
 
 export async function sendMenuReply(to: string, body: string, buttons?: Array<{ id: string; title: string }>): Promise<void> {
