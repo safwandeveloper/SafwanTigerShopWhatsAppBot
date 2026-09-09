@@ -8,6 +8,34 @@ export const MAIN_MENU_ROWS = [
   { id: 'menu:channel', title: '📢 Updates Channel', description: 'New stock & announcements' },
 ] as const;
 
+export const COMMANDS = [
+  { name: 'start', description: 'Open the main menu' },
+  { name: 'products', description: 'Browse products' },
+  { name: 'deposit', description: 'Add funds to your wallet' },
+  { name: 'settings', description: 'Your account & settings' },
+  { name: 'support', description: 'Get help' },
+] as const;
+
+export function commandMenuId(text: string): string | null {
+  const token = text.trim().toLowerCase().split(/\s+/)[0] ?? '';
+  if (!token.startsWith('/')) return null;
+
+  switch (token.slice(1)) {
+    case 'start':
+      return 'menu:main';
+    case 'products':
+      return 'menu:shop';
+    case 'deposit':
+      return 'menu:topup';
+    case 'settings':
+      return 'menu:profile';
+    case 'support':
+      return 'menu:support';
+    default:
+      return null;
+  }
+}
+
 export function menuReplyText(id: string): string | null {
   switch (id) {
     case 'menu:shop':

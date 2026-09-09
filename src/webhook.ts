@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
-import { menuReplyText } from './menu.js';
+import { commandMenuId, menuReplyText } from './menu.js';
 import { sendMainMenu, sendMenuReply } from './whatsapp.js';
 
 function respond(res: ServerResponse, status: number, body: string): void {
@@ -83,7 +83,15 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         from: message.from,
         kind: message.kind,
       });
-      if (message.kind === 'text' || message.id === 'menu:main') {
+      if (message.kind === 'text') {
+        const id = commandMenuId(message.text);
+        const reply = id ? menuReplyText(id) : null;
+        if (id === 'menu:main' || !reply) {
+          await sendMainMenu(message.from);
+        } else {
+          await sendMenuReply(message.from, reply);
+        }
+      } else if (message.id === 'menu:main') {
         await sendMainMenu(message.from);
       } else {
         const reply = menuReplyText(message.id);
