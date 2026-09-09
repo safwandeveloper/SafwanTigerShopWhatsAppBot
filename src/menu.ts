@@ -1,3 +1,5 @@
+import { config } from './config.js';
+
 export const MAIN_MENU_ROWS = [
   { id: 'menu:shop', title: '🛍️ Shop', description: 'Browse products & offers' },
   { id: 'menu:topup', title: '👛 Top-up Wallet', description: 'Add balance securely' },
@@ -36,16 +38,47 @@ export function commandMenuId(text: string): string | null {
   }
 }
 
+export function icebreakerMenuId(text: string): string | null {
+  const normalized = text
+    .trim()
+    .toLowerCase()
+    .replace(/[?!]+$/g, '')
+    .replace(/\s+/g, ' ');
+  switch (normalized) {
+    case 'show commands':
+      return 'menu:commands';
+    case 'what can this bot do':
+    case 'what this bot can':
+    case 'which purpose is this bot':
+      return 'menu:purpose';
+    case 'browse products':
+      return 'menu:shop';
+    case 'how do i topup':
+    case 'how do i top up':
+      return 'menu:topup';
+    case 'i need support':
+      return 'menu:support';
+    default:
+      return null;
+  }
+}
+
 export function menuReplyText(id: string): string | null {
   switch (id) {
+    case 'menu:commands':
+      return `📋 *Commands*\n\n/start — Open the main menu\n/products — Browse products\n/deposit — Add funds to your wallet\n/settings — Your account & settings\n/support — Get help`;
+    case 'menu:purpose':
+      return '✨ *What can this bot do?*\n\nSafwanTiger Shop helps you browse digital products, receive instant delivery, top up your wallet, get support, and stay updated with new stock.';
     case 'menu:shop':
       return '🛍️ *Shop*\n\nOur product catalog is arriving on WhatsApp very soon.\n_Until then, you can browse and order on Telegram._';
     case 'menu:topup':
-      return '👛 *Top-up Wallet*\n\nWallet top-ups on WhatsApp are coming soon.\n_Your balance and payments will stay secure and instant._';
+      return config.topupResponse;
     case 'menu:profile':
       return '⚙️ *My Account*\n\nOrders, balance and settings will appear here soon.';
     case 'menu:support':
-      return '💬 *Support*\n\nOur team is here for you.\nWe usually reply within a few minutes — just describe your issue.';
+      return '💬 *Support*\n\nOur team is here for you. Choose Telegram Support for direct contact, or start a live chat here and describe your issue.';
+    case 'menu:live_support':
+      return '💬 *Live Support*\n\nPlease describe your issue in your next message. A support conversation can continue here.';
     case 'menu:ai_support':
       return '🥝 *Kiwi Ai*\n\nYour instant AI assistant is coming soon to WhatsApp.';
     case 'menu:refer':

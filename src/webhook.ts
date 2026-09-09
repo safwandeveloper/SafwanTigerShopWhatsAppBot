@@ -1,7 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
-import { commandMenuId, menuReplyText } from './menu.js';
-import { sendMainMenu, sendMenuReply } from './whatsapp.js';
+import { commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
+import {
+  sendLiveSupportPrompt,
+  sendMainMenu,
+  sendMenuReply,
+  sendSupportReply,
+  sendTextMessage,
+} from './whatsapp.js';
+
+let liveSupportUser: string | null = null;
 
 function respond(res: ServerResponse, status: number, body: string): void {
   res.writeHead(status, { 'content-type': 'text/plain; charset=utf-8' });
@@ -84,10 +92,49 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         kind: message.kind,
       });
       if (message.kind === 'text') {
-        const id = commandMenuId(message.text);
+        if (message.from === config.adminPhoneNumber && liveSupportUser) {
+          await sendTextMessage(liveSupportUser, `💬 *Support*\n\n${message.text}`);
+          return;
+        }
+        const id = icebreakerMenuId(message.text) ?? commandMenuId(message.text);
+        if (id === 'menu:live_support') {
+          if (liveSupportUser && liveSupportUser !== message.from) {
+            await sendTextMessage(
+              message.from,
+              '⏳ Live Support is currently helping another customer. Please try again shortly.',
+            );
+            return;
+          }
+          liveSupportUser = message.from;
+          await sendLiveSupportPrompt(message.from);
+          if (config.adminPhoneNumber) {
+            await sendTextMessage(
+              config.adminPhoneNumber,
+              '🔔 *New WhatsApp Live Support*\n\nA customer is waiting for help. Reply to this message to continue the chat.',
+            );
+          }
+          return;
+        }
+        if (id === 'menu:main') {
+          liveSupportUser = null;
+        }
+        if (liveSupportUser === message.from && !id) {
+          if (config.adminPhoneNumber) {
+            await sendTextMessage(config.adminPhoneNumber, `💬 *Customer message*\n\n${message.text}`);
+            await sendTextMessage(message.from, 'Message received. A support team member will reply here shortly.');
+          } else {
+            await sendTextMessage(
+              message.from,
+              'Message received. Please configure the WhatsApp admin number for live support replies.',
+            );
+          }
+          return;
+        }
         const reply = id ? menuReplyText(id) : null;
         if (id === 'menu:main' || !reply) {
           await sendMainMenu(message.from);
+        } else if (id === 'menu:support') {
+          await sendSupportReply(message.from);
         } else {
           await sendMenuReply(message.from, reply);
         }
@@ -95,7 +142,9 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         await sendMainMenu(message.from);
       } else {
         const reply = menuReplyText(message.id);
-        if (reply) {
+        if (message.id === 'menu:support') {
+          await sendSupportReply(message.from);
+        } else if (reply) {
           await sendMenuReply(message.from, reply);
         } else {
           await sendMainMenu(message.from);

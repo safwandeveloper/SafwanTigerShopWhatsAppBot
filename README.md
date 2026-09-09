@@ -17,6 +17,12 @@ Required environment variables:
 - `WHATSAPP_ACCESS_TOKEN`: Meta WhatsApp Cloud API access token
 - `WHATSAPP_PHONE_NUMBER_ID`: the phone number ID from WhatsApp Manager
 
+Optional response settings:
+
+- `WHATSAPP_TOPUP_RESPONSE`: admin-editable reply for the “How do I top up?” icebreaker. Update it in Railway Variables and redeploy.
+- `WHATSAPP_TELEGRAM_SUPPORT_URL`: Telegram support URL used by the Support icebreaker.
+- `WHATSAPP_ADMIN_PHONE_NUMBER`: admin WhatsApp number, digits only, for live-support message relay.
+
 The service listens on `PORT` (default `3000`) and exposes:
 
 - `GET /webhook`: Meta webhook verification
@@ -51,6 +57,19 @@ variables. Commands can also be configured manually in WhatsApp Manager →
 Phone numbers → Automations → Commands. Enabling `enable_welcome_message`
 makes Meta send a `request_welcome` event when someone opens the chat for the
 first time; this bot ignores that event.
+
+## Icebreakers
+
+Recommended icebreakers are:
+
+- `Show Commands` — shows `/start`, `/products`, `/deposit`, `/settings`, and `/support`.
+- `What can this bot do?` — explains the shop categories and features.
+- `Browse products` — opens the shop response.
+- `How do I top up?` — uses `WHATSAPP_TOPUP_RESPONSE`.
+- `I need support` — offers the configured Telegram support link and a live chat button.
+
+Meta stores the icebreaker labels; the bot supplies the responses through the webhook.
+Live support relays one active customer at a time to `WHATSAPP_ADMIN_PHONE_NUMBER`.
 
 ## Commands
 
