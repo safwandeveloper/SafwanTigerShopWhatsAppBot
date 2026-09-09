@@ -35,6 +35,11 @@ import {
 
 let liveSupportUser: string | null = null;
 
+async function sendCustomerMainMenu(phoneNumber: string): Promise<void> {
+  const customer = await getCustomer(phoneNumber);
+  await sendMainMenu(phoneNumber, await getCustomerMenuView(phoneNumber), customer?.balance ?? 0);
+}
+
 function respond(res: ServerResponse, status: number, body: string): void {
   res.writeHead(status, { 'content-type': 'text/plain; charset=utf-8' });
   res.end(body);
@@ -168,7 +173,7 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         if (id === 'menu:more') {
           await sendMoreMenu(message.from);
         } else if (id === 'menu:main' || !reply) {
-          await sendMainMenu(message.from, await getCustomerMenuView(message.from));
+          await sendCustomerMainMenu(message.from);
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
         } else if (id === 'menu:profile') {
@@ -179,7 +184,7 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
           await sendMenuReply(message.from, reply);
         }
       } else if (message.id === 'menu:main') {
-        await sendMainMenu(message.from, await getCustomerMenuView(message.from));
+        await sendCustomerMainMenu(message.from);
       } else if (message.from !== config.adminPhoneNumber && message.id === 'menu:profile') {
         await sendSettingsMenu(message.from, await getCustomer(message.from));
       } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:view') {
@@ -192,7 +197,8 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         const view: MenuView = message.id.endsWith(':list') ? 'list' : 'buttons';
         try {
           await setCustomerMenuView(message.from, view);
-          await sendMainMenu(message.from, view);
+          const customer = await getCustomer(message.from);
+          await sendMainMenu(message.from, view, customer?.balance ?? 0);
         } catch (error) {
           console.error('WhatsApp menu view update failed', error);
           await sendTextMessage(message.from, 'Menu view storage is not configured yet. Please try again after setup.');
@@ -243,7 +249,7 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         } else if (reply) {
           await sendMenuReply(message.from, reply);
         } else {
-          await sendMainMenu(message.from);
+          await sendCustomerMainMenu(message.from);
         }
       }
     }

@@ -98,7 +98,7 @@ export async function getCustomer(phoneNumber: string): Promise<CustomerRow | nu
 export async function getCustomerMenuView(phoneNumber: string): Promise<MenuView> {
   try {
     const customer = await getCustomer(phoneNumber);
-    return customer?.menu_view === 'list' ? 'list' : 'buttons';
+    return customer?.menu_view === 'buttons' ? 'buttons' : 'list';
   } catch {
     return 'buttons';
   }
