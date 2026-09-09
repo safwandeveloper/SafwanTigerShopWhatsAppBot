@@ -64,17 +64,17 @@ async function readRows<T>(table: string, search: string): Promise<T[]> {
   return (await response.json()) as T[];
 }
 
-export async function recordCustomer(phoneNumber: string): Promise<void> {
+export async function recordCustomer(phoneNumber: string, displayName?: string): Promise<void> {
   if (!isConfigured()) return;
+  const customer: { phone_number: string; last_seen_at: string; display_name?: string } = {
+    phone_number: phoneNumber,
+    last_seen_at: new Date().toISOString(),
+  };
+  if (displayName) customer.display_name = displayName;
   const response = await request('whatsapp_customers', '?on_conflict=phone_number', {
     method: 'POST',
     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify([
-      {
-        phone_number: phoneNumber,
-        last_seen_at: new Date().toISOString(),
-      },
-    ]),
+    body: JSON.stringify([customer]),
   });
   if (!response.ok) {
     throw new Error(`WhatsApp Supabase customer upsert failed with HTTP ${response.status}`);
@@ -100,7 +100,7 @@ export async function getCustomerMenuView(phoneNumber: string): Promise<MenuView
     const customer = await getCustomer(phoneNumber);
     return customer?.menu_view === 'buttons' ? 'buttons' : 'list';
   } catch {
-    return 'buttons';
+    return 'list';
   }
 }
 
@@ -126,7 +126,7 @@ export async function getCustomerOrders(phoneNumber: string): Promise<OrderRow[]
   if (!isConfigured()) return [];
   return readRows<OrderRow>(
     'whatsapp_orders',
-    `?select=id,customer_phone,product_name,amount,status,created_at&customer_phone=eq.${encodeURIComponent(phoneNumber)}&order=created_at.desc&limit=10`,
+    `?select=id,customer_phone,product_name,amount,status,created_at&customer_phone=eq.${encodeURIComponent(phoneNumber)}&order=created_at.desc&limit=1000`,
   );
 }
 

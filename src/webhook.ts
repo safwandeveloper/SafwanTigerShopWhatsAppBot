@@ -59,15 +59,17 @@ function readBody(req: IncomingMessage): Promise<string> {
 }
 
 type FirstMessage =
-  | { from: string; kind: 'text'; text: string }
-  | { from: string; kind: 'interactive'; id: string };
+  | { from: string; displayName: string | null; kind: 'text'; text: string }
+  | { from: string; displayName: string | null; kind: 'interactive'; id: string };
 
 function firstMessage(payload: unknown): FirstMessage | null {
   if (!payload || typeof payload !== 'object') return null;
   const entries = (payload as { entry?: unknown[] }).entry;
   const change = (entries?.[0] as { changes?: unknown[] } | undefined)?.changes?.[0] as
-    | { value?: { messages?: unknown[] } }
+    | { value?: { contacts?: unknown[]; messages?: unknown[] } }
     | undefined;
+  const contact = change?.value?.contacts?.[0] as { profile?: { name?: unknown } } | undefined;
+  const displayName = typeof contact?.profile?.name === 'string' ? contact.profile.name : null;
   const message = change?.value?.messages?.[0] as
     | {
         from?: unknown;
@@ -81,12 +83,12 @@ function firstMessage(payload: unknown): FirstMessage | null {
     | undefined;
   if (typeof message?.from !== 'string') return null;
   if (message.type === 'text' && typeof message.text?.body === 'string') {
-    return { from: message.from, kind: 'text', text: message.text.body };
+    return { from: message.from, displayName, kind: 'text', text: message.text.body };
   }
   if (message.type === 'interactive') {
     const id = message.interactive?.list_reply?.id ?? message.interactive?.button_reply?.id;
     if (typeof id === 'string') {
-      return { from: message.from, kind: 'interactive', id };
+      return { from: message.from, displayName, kind: 'interactive', id };
     }
   }
   return null;
@@ -121,7 +123,7 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
           kind: message.kind,
         });
         if (message.from !== config.adminPhoneNumber) {
-          void recordCustomer(message.from).catch((error: unknown) => {
+          void recordCustomer(message.from, message.displayName ?? undefined).catch((error: unknown) => {
             console.error('WhatsApp customer record failed', error);
           });
         }
@@ -177,7 +179,8 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
         } else if (id === 'menu:profile') {
-          await sendSettingsMenu(message.from, await getCustomer(message.from));
+          const customer = await getCustomer(message.from);
+          await sendSettingsMenu(message.from, customer, await getCustomerOrders(message.from));
         } else if (id === 'menu:commands') {
           await sendCommandsReply(message.from, reply);
         } else {
@@ -186,7 +189,8 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
       } else if (message.id === 'menu:main') {
         await sendCustomerMainMenu(message.from);
       } else if (message.from !== config.adminPhoneNumber && message.id === 'menu:profile') {
-        await sendSettingsMenu(message.from, await getCustomer(message.from));
+        const customer = await getCustomer(message.from);
+        await sendSettingsMenu(message.from, customer, await getCustomerOrders(message.from));
       } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:view') {
         await sendMenuViewMenu(message.from, await getCustomerMenuView(message.from));
       } else if (message.from !== config.adminPhoneNumber && message.id === 'settings:orders') {

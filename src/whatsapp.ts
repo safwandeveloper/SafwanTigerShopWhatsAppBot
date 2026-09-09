@@ -78,11 +78,43 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'list', bala
   ]);
 }
 
-export async function sendSettingsMenu(to: string, customer: CustomerRow | null): Promise<void> {
+function formatProfileDate(value: string): string {
+  return new Date(value).toLocaleDateString('en-US');
+}
+
+function customerCode(phoneNumber: string): string {
+  let hash = 0;
+  for (const character of phoneNumber) {
+    hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  }
+  return `U-${hash.toString(36).toUpperCase().padStart(6, '0').slice(-6)}`;
+}
+
+export async function sendSettingsMenu(
+  to: string,
+  customer: CustomerRow | null,
+  orders: OrderRow[] = [],
+): Promise<void> {
   const profile = customer?.display_name || 'WhatsApp customer';
   const balance = customer?.balance ?? 0;
-  const joined = customer ? new Date(customer.created_at).toISOString().slice(0, 10) : 'Not recorded';
-  await sendMenuReply(to, `*Settings*\n\n*Profile*\n${profile}\n\n*Wallet*\nBalance: ${balance}\n\n*Joined*\n${joined}\n\nChoose what you want to view:`, [
+  const phoneNumber = customer?.phone_number ?? to;
+  const spent = orders.reduce((total, order) => total + order.amount, 0);
+  const joined = customer ? formatProfileDate(customer.created_at) : 'Not recorded';
+  const body = [
+    '👤 *MY PROFILE*',
+    '',
+    `*Name:* ${profile}`,
+    `*Customer ID:* \`${customerCode(phoneNumber)}\``,
+    `*WhatsApp:* ${phoneNumber}`,
+    '*Currency:* PKR',
+    `*Wallet:* PKR ${balance}`,
+    `*Orders:* ${orders.length}`,
+    `*Spent:* PKR ${spent}`,
+    `*Since:* ${joined}`,
+    '',
+    'Choose an option below:',
+  ].join('\n');
+  await sendMenuReply(to, body, [
     { id: 'settings:orders', title: 'Order History' },
     { id: 'settings:deposits', title: 'Deposit History' },
     { id: 'settings:view', title: 'Menu View' },
@@ -243,16 +275,17 @@ export async function sendSupportReply(to: string): Promise<void> {
       },
     });
   }
-  await sendMenuReply(to, menuReplyTextForSupport());
+  await sendMenuReply(to, menuReplyTextForSupport(), [{ id: 'menu:main', title: 'Main Menu' }]);
 }
 
 export async function sendLiveSupportPrompt(to: string): Promise<void> {
   await sendMenuReply(
     to,
     '💬 *Live Support*\n\nPlease describe your issue in your next message. Our support team will continue the conversation here.',
+    [{ id: 'menu:main', title: 'Main Menu' }],
   );
 }
 
 function menuReplyTextForSupport(): string {
-  return '💬 *Live Support*\n\nTap Live Support and send your issue here. Our team can continue the conversation in this chat.';
+  return '💬 *Live Support*\n\nPlease describe your issue in your next message. Our support team will continue the conversation here.';
 }
