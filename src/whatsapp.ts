@@ -37,7 +37,7 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
   });
 }
 
-export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): Promise<void> {
+export async function sendMainMenu(to: string, menuView: MenuView = 'list', balance = 0): Promise<void> {
   if (menuView === 'list') {
     await postMessage({
       to,
@@ -45,7 +45,7 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): 
       interactive: {
         type: 'list',
         header: { type: 'text', text: 'SafwanTiger Shop' },
-        body: { text: '*Welcome to SafwanTiger Shop!*\n\nChoose an option below.' },
+        body: { text: `*Welcome to SafwanTiger Shop!*\n\nWallet balance: ${balance}\n\nChoose an option below.` },
         action: {
           button: 'Open Menu',
           sections: [
@@ -54,7 +54,7 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): 
               rows: [
                 { id: 'menu:shop', title: 'Shop', description: 'Browse products & offers' },
                 { id: 'menu:topup', title: 'Top-up Wallet', description: 'Add balance securely' },
-                { id: 'menu:profile', title: 'Settings', description: 'Orders, deposits & account' },
+                { id: 'menu:profile', title: 'Settings', description: 'Profile, orders & deposits' },
               ],
             },
             {
@@ -62,7 +62,6 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): 
               rows: [
                 { id: 'menu:support', title: 'Support', description: 'Chat with our team' },
                 { id: 'menu:ai_support', title: 'Kiwi Ai', description: 'Instant AI assistant' },
-                { id: 'menu:refer', title: 'Refer & Earn', description: 'Invite friends, get rewards' },
                 { id: 'menu:channel', title: 'Updates Channel', description: 'New stock & announcements' },
               ],
             },
@@ -72,7 +71,7 @@ export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): 
     });
     return;
   }
-  await sendMenuReply(to, '*Welcome to SafwanTiger Shop!*\n\nYour wallet balance is available in Settings.', [
+  await sendMenuReply(to, `*Welcome to SafwanTiger Shop!*\n\nWallet balance: ${balance}`, [
     { id: 'menu:shop', title: 'Shop' },
     { id: 'menu:topup', title: 'Top-up' },
     { id: 'menu:more', title: 'More' },
