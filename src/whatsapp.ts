@@ -39,20 +39,15 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
 export async function sendMainMenu(to: string): Promise<void> {
   await sendMenuReply(to, '*Welcome to SafwanTiger Shop!*\n\nYour wallet balance is available in Settings.', [
     { id: 'menu:shop', title: 'Shop' },
-    { id: 'menu:topup', title: 'Top-up Wallet' },
-    { id: 'menu:profile', title: 'Settings' },
-  ]);
-  await sendMenuReply(to, '*More options*', [
-    { id: 'menu:support', title: 'Support' },
-    { id: 'menu:ai_support', title: 'Kiwi Ai' },
+    { id: 'menu:topup', title: 'Top-up' },
     { id: 'menu:more', title: 'More' },
   ]);
 }
 
 export async function sendMoreMenu(to: string): Promise<void> {
   await sendMenuReply(to, '*More options*', [
-    { id: 'menu:refer', title: 'Refer & Earn' },
-    { id: 'menu:channel', title: 'Updates' },
+    { id: 'menu:profile', title: 'Settings' },
+    { id: 'menu:support', title: 'Support' },
     { id: 'menu:main', title: 'Back' },
   ]);
 }
