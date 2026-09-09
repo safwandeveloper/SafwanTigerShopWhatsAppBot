@@ -65,7 +65,16 @@ export async function sendMainMenu(to: string): Promise<void> {
   });
 }
 
-export async function sendMenuReply(to: string, body: string): Promise<void> {
+export async function sendMenuReply(to: string, body: string, buttons?: Array<{ id: string; title: string }>): Promise<void> {
+  const defaultButtons = [
+    { id: 'menu:main', title: 'Main Menu →' },
+    { id: 'menu:live_support', title: 'Live Support →' },
+  ];
+  const safeButtons = (buttons ?? defaultButtons).slice(0, 3).map((b) => ({
+    type: 'reply' as const,
+    reply: { id: b.id, title: b.title },
+  }));
+
   await postMessage({
     to,
     type: 'interactive',
@@ -74,20 +83,13 @@ export async function sendMenuReply(to: string, body: string): Promise<void> {
       header: { type: 'text', text: 'SafwanTiger Shop' },
       body: { text: body },
       footer: { text: 'Need help? Tap Support anytime.' },
-      action: {
-        buttons: [
-          {
-            type: 'reply',
-            reply: { id: 'menu:main', title: '🏠 Main Menu' },
-          },
-          {
-            type: 'reply',
-            reply: { id: 'menu:live_support', title: '💬 Live Support' },
-          },
-        ],
-      },
+      action: { buttons: safeButtons },
     },
   });
+}
+
+export async function sendCommandsReply(to: string, body: string): Promise<void> {
+  await sendMenuReply(to, body, [{ id: 'menu:live_support', title: 'Live Support →' }]);
 }
 
 export async function sendSupportReply(to: string): Promise<void> {

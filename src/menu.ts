@@ -68,7 +68,7 @@ export function icebreakerMenuId(text: string): string | null {
 export function menuReplyText(id: string): string | null {
   switch (id) {
     case 'menu:commands':
-      return `📋 *Commands*\n\n/start — Open the main menu\n/products — Browse products\n/deposit — Add funds to your wallet\n/settings — Your account & settings\n/support — Get help`;
+      return `Welcome To SafwanTiger Shop!\n•*Commands*:\n\n/start — Open the main menu\n/products — Browse products\n/deposit — Add funds to wallet\n/settings — Your Profile Data\n/support — Get help\n\nNeed help? Tap Support anytime.`;
     case 'menu:purpose':
       return '✨ *What can this bot do?*\n\nSafwanTiger Shop helps you browse digital products, receive instant delivery, top up your wallet, get support, and stay updated with new stock.';
     case 'menu:shop':
