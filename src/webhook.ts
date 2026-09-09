@@ -174,13 +174,17 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         const reply = id ? menuReplyText(id) : null;
         if (id === 'menu:more') {
           await sendMoreMenu(message.from);
-        } else if (id === 'menu:main' || !reply) {
-          await sendCustomerMainMenu(message.from);
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
         } else if (id === 'menu:profile') {
           const customer = await getCustomer(message.from);
           await sendSettingsMenu(message.from, customer, await getCustomerOrders(message.from));
+        } else if (id === 'settings:orders') {
+          await sendOrderHistory(message.from, await getCustomerOrders(message.from));
+        } else if (id === 'settings:deposits') {
+          await sendDepositHistory(message.from, await getCustomerDeposits(message.from));
+        } else if (id === 'menu:main' || !reply) {
+          await sendCustomerMainMenu(message.from);
         } else if (id === 'menu:commands') {
           await sendCommandsReply(message.from, reply);
         } else {

@@ -104,16 +104,19 @@ export async function sendSettingsMenu(
   const body = [
     '👤 *MY PROFILE*',
     '',
+    '*PROFILE*',
     `*Name:* ${profile}`,
     `*Customer ID:* \`${customerCode(phoneNumber)}\``,
     `*WhatsApp:* ${phoneNumber}`,
     '*Currency:* PKR',
+    '',
+    '*STATS*',
     `*Wallet:* PKR ${balance}`,
     `*Orders:* ${orders.length}`,
     `*Spent:* PKR ${spent}`,
     `*Since:* ${joined}`,
     '',
-    'Choose an option below:',
+    '📌 Choose an option below:',
   ].join('\n');
   await sendMenuReply(to, body, [
     { id: 'settings:orders', title: 'Order History' },
@@ -136,15 +139,15 @@ function formatHistoryDate(value: string): string {
 
 export async function sendOrderHistory(to: string, rows: OrderRow[]): Promise<void> {
   const body = rows.length
-    ? `*Order History*\n\n${rows.map((row) => `• ${row.product_name}\n  ${row.amount} — ${row.status} — ${formatHistoryDate(row.created_at)}`).join('\n')}`
-    : '*Order History*\n\nNo orders recorded yet.';
+    ? `📦 *Order History*\n\n${rows.map((row) => `🛍️ ${row.product_name}\n💰 ${row.amount} — ${row.status} — ${formatHistoryDate(row.created_at)}`).join('\n\n')}`
+    : '📦 *Order History*\n\nNo orders recorded yet.';
   await sendMenuReply(to, body, [{ id: 'menu:profile', title: 'Back' }]);
 }
 
 export async function sendDepositHistory(to: string, rows: DepositRow[]): Promise<void> {
   const body = rows.length
-    ? `*Deposit History*\n\n${rows.map((row) => `• ${row.amount}\n  ${row.status}${row.reference ? ` — ${row.reference}` : ''} — ${formatHistoryDate(row.created_at)}`).join('\n')}`
-    : '*Deposit History*\n\nNo deposits recorded yet.';
+    ? `💳 *Deposit History*\n\n${rows.map((row) => `💰 ${row.amount}\n📌 ${row.status}${row.reference ? ` — ${row.reference}` : ''}\n📅 ${formatHistoryDate(row.created_at)}`).join('\n\n')}`
+    : '💳 *Deposit History*\n\nNo deposits recorded yet.';
   await sendMenuReply(to, body, [{ id: 'menu:profile', title: 'Back' }]);
 }
 

@@ -30,6 +30,10 @@ export function commandMenuId(text: string): string | null {
       return 'menu:topup';
     case 'settings':
       return 'menu:profile';
+    case 'orders':
+      return 'settings:orders';
+    case 'deposits':
+      return 'settings:deposits';
     case 'support':
       return 'menu:support';
     default:
@@ -63,6 +67,10 @@ export function icebreakerMenuId(text: string): string | null {
       return 'menu:topup';
     case 'i need support':
       return 'menu:support';
+    case 'order history':
+      return 'settings:orders';
+    case 'deposit history':
+      return 'settings:deposits';
     default:
       return null;
   }
@@ -79,15 +87,13 @@ export function menuReplyText(id: string): string | null {
     case 'menu:topup':
       return config.topupResponse;
     case 'menu:profile':
-      return '*Settings*\n\n*Profile*\nYour WhatsApp account details.\n\n*Wallet*\nView your balance and manage deposits.\n\n*Orders*\nAccess your digital purchases and delivery status.\n\n*Referrals*\nInvite friends and track your rewards.\n\nYour account tools will be available here as each feature is enabled.';
+      return '👤 *My Profile*\n\n📊 View your account details, wallet balance, order history, and deposit history below.';
     case 'menu:support':
       return '💬 *Support*\n\nOur team is here for you. Choose Telegram Support for direct contact, or start a live chat here and describe your issue.';
     case 'menu:live_support':
       return '💬 *Live Support*\n\nPlease describe your issue in your next message. A support conversation can continue here.';
     case 'menu:ai_support':
       return '🥝 *Kiwi Ai*\n\nYour instant AI assistant is coming soon to WhatsApp.';
-    case 'menu:refer':
-      return '🎁 *Refer & Earn*\n\nInvite friends and earn rewards on every purchase.\n_Referral links on WhatsApp are coming soon._';
     case 'menu:channel':
       return '📢 *Updates Channel*\n\nStay up to date with new stock alerts, offers, and announcements.\n\nJoin the official channel:\nhttps://t.me/safwantigerstore';
     default:
