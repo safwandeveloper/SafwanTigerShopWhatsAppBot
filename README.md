@@ -36,6 +36,22 @@ Deploy this service behind a public HTTPS URL, then set:
 
 Subscribe the app to the WhatsApp `messages` field after verification.
 
+## WhatsApp commands
+
+Available commands:
+
+- `/start` — Open the main menu
+- `/products` — Browse products
+- `/deposit` — Add funds to your wallet
+- `/settings` — Your account & settings
+- `/support` — Get help
+
+Run `npm run setup:commands` once after deployment with the same environment
+variables. Commands can also be configured manually in WhatsApp Manager →
+Phone numbers → Automations → Commands. Enabling `enable_welcome_message`
+makes Meta send a `request_welcome` event when someone opens the chat for the
+first time; this bot ignores that event.
+
 ## Commands
 
 ```bash
