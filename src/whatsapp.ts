@@ -66,7 +66,7 @@ export async function sendMainMenu(to: string): Promise<void> {
 }
 
 export async function sendMenuReply(to: string, body: string, buttons?: Array<{ id: string; title: string }>): Promise<void> {
-  const defaultButtons = [{ id: 'menu:main', title: 'Main Menu' }];
+  const defaultButtons = [{ id: 'menu:main', title: '→' }];
   const safeButtons = (buttons ?? defaultButtons).slice(0, 3).map((b) => ({
     type: 'reply' as const,
     reply: { id: b.id, title: b.title },
@@ -86,7 +86,7 @@ export async function sendMenuReply(to: string, body: string, buttons?: Array<{ 
 }
 
 export async function sendCommandsReply(to: string, body: string): Promise<void> {
-  await sendMenuReply(to, body, [{ id: 'menu:main', title: 'Main Menu' }]);
+  await sendMenuReply(to, body, [{ id: 'menu:main', title: '→' }]);
 }
 
 export async function sendSupportReply(to: string): Promise<void> {
