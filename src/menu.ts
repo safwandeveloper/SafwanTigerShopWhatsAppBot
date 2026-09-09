@@ -68,9 +68,9 @@ export function icebreakerMenuId(text: string): string | null {
 export function menuReplyText(id: string): string | null {
   switch (id) {
     case 'menu:commands':
-      return `Welcome To SafwanTiger Shop!\n•*Commands*:\n\n/start — Open the main menu\n/products — Browse products\n/deposit — Add funds to wallet\n/settings — Your Profile Data\n/support — Get help\n\nNeed help? Tap Support anytime.`;
+      return `*Welcome To SafwanTiger Shop!*\n\n*Commands:*\n\n/start — Open the main menu\n/products — Browse products\n/deposit — Add funds to wallet\n/settings — Your Profile Data\n/support — Get help`;
     case 'menu:purpose':
-      return '✨ *What can this bot do?*\n\nSafwanTiger Shop helps you browse digital products, receive instant delivery, top up your wallet, get support, and stay updated with new stock.';
+      return '*What can this bot do?*\n\nSafwanTiger Shop is an official automated shopping assistant, available 24/7 to help you browse digital products and subscriptions, discover new stock, learn about wallet top-ups, and reach support.\n\nIt is designed to make shopping simple, secure, and convenient, with quick replies whenever you need assistance.';
     case 'menu:shop':
       return '🛍️ *Shop*\n\nOur product catalog is arriving on WhatsApp very soon.\n_Until then, you can browse and order on Telegram._';
     case 'menu:topup':
