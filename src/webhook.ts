@@ -1,8 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
+import { getAdminData, recordCustomer } from './data.js';
 import { adminMenuId, commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
 import {
   sendAdminCommands,
+  sendAdminData,
+  sendAdminDataMenu,
   sendAdminDashboard,
   sendAdminMenu,
   sendAdminMoreMenu,
@@ -95,11 +98,16 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
     const message = firstMessage(payload);
     respond(res, 200, 'EVENT_RECEIVED');
     if (message) {
-      console.info('Received WhatsApp message', {
-        from: message.from,
-        kind: message.kind,
-      });
-      if (message.kind === 'text') {
+        console.info('Received WhatsApp message', {
+          from: message.from,
+          kind: message.kind,
+        });
+        if (message.from !== config.adminPhoneNumber) {
+          void recordCustomer(message.from).catch((error: unknown) => {
+            console.error('WhatsApp customer record failed', error);
+          });
+        }
+        if (message.kind === 'text') {
         const adminId = adminMenuId(message.text);
         if (message.from === config.adminPhoneNumber && adminId === 'admin:main') {
           await sendAdminMenu(message.from);
@@ -166,6 +174,20 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
           await sendAdminSupport(message.from, liveSupportUser);
         } else if (message.id === 'admin:more') {
           await sendAdminMoreMenu(message.from);
+        } else if (message.id === 'admin:data') {
+          await sendAdminDataMenu(message.from);
+        } else if (message.id === 'admin:customers' || message.id === 'admin:orders' || message.id === 'admin:deposits') {
+          try {
+            const data = await getAdminData();
+            const section = message.id.slice('admin:'.length) as 'customers' | 'orders' | 'deposits';
+            await sendAdminData(message.from, section, data);
+          } catch (error) {
+            console.error('WhatsApp admin data query failed', error);
+            await sendTextMessage(
+              message.from,
+              'WhatsApp data storage is not configured yet. Add the separate Supabase variables and try again.',
+            );
+          }
         } else if (message.id === 'admin:settings') {
           await sendAdminSettings(message.from);
         } else if (message.id === 'admin:commands') {

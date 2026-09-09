@@ -1,4 +1,5 @@
 import { config } from './config.js';
+import type { AdminData } from './data.js';
 
 async function postMessage(payload: Record<string, unknown>): Promise<void> {
   if (!config.accessToken || !config.phoneNumberId) {
@@ -81,8 +82,37 @@ export async function sendAdminMenu(to: string): Promise<void> {
 
 export async function sendAdminMoreMenu(to: string): Promise<void> {
   await sendMenuReply(to, '*Admin Panel*\n\nMore tools:', [
+    { id: 'admin:data', title: 'Data' },
     { id: 'admin:settings', title: 'Settings' },
-    { id: 'admin:commands', title: 'Commands' },
+    { id: 'admin:main', title: 'Back' },
+  ]);
+}
+
+export async function sendAdminDataMenu(to: string): Promise<void> {
+  await sendMenuReply(to, '*Data Details*\n\nChoose a data section:', [
+    { id: 'admin:customers', title: 'Customers' },
+    { id: 'admin:orders', title: 'Orders' },
+    { id: 'admin:deposits', title: 'Deposits' },
+  ]);
+}
+
+function formatDate(value: string): string {
+  return new Date(value).toISOString().slice(0, 10);
+}
+
+export async function sendAdminData(
+  to: string,
+  section: 'customers' | 'orders' | 'deposits',
+  data: AdminData,
+): Promise<void> {
+  const body =
+    section === 'customers'
+      ? `*Customers*\n\n${data.customers.length ? data.customers.map((row) => `• ${row.display_name || row.phone_number} — balance ${row.balance} — seen ${formatDate(row.last_seen_at)}`).join('\n') : 'No customer records yet.'}`
+      : section === 'orders'
+        ? `*Orders*\n\n${data.orders.length ? data.orders.map((row) => `• ${row.id} — ${row.product_name} — ${row.amount} — ${row.status}`).join('\n') : 'No order records yet.'}`
+        : `*Deposits*\n\n${data.deposits.length ? data.deposits.map((row) => `• ${row.id} — ${row.amount} — ${row.status}${row.reference ? ` — ${row.reference}` : ''}`).join('\n') : 'No deposit records yet.'}`;
+  await sendMenuReply(to, body, [
+    { id: 'admin:data', title: 'Data' },
     { id: 'admin:main', title: 'Back' },
   ]);
 }

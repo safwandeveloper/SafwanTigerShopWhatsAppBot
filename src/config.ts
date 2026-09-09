@@ -24,6 +24,8 @@ export const config = {
     '👛 *Top-up Wallet*\n\nWallet top-ups on WhatsApp are coming soon.\n_Your balance and payments will stay secure and instant._',
   telegramSupportUrl: process.env.WHATSAPP_TELEGRAM_SUPPORT_URL?.trim() ?? '',
   adminPhoneNumber: normalizePhoneNumber(process.env.WHATSAPP_ADMIN_PHONE_NUMBER?.trim() || '03276996499'),
+  supabaseUrl: process.env.WHATSAPP_SUPABASE_URL?.trim() ?? '',
+  supabaseServiceRoleKey: process.env.WHATSAPP_SUPABASE_SERVICE_ROLE_KEY?.trim() ?? '',
 };
 
 if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65_535) {
