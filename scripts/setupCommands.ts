@@ -21,7 +21,13 @@ async function main(): Promise<void> {
       body: JSON.stringify({
         enable_welcome_message: true,
         commands: COMMANDS,
-        prompts: ['Show me products', 'How do I top up?', 'I need support'],
+        prompts: [
+          'Show Commands',
+          'What can this bot do?',
+          'Browse products',
+          'How do I top up?',
+          'I need support',
+        ],
       }),
     },
   );
