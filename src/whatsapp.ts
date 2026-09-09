@@ -82,10 +82,44 @@ export async function sendMenuReply(to: string, body: string): Promise<void> {
           },
           {
             type: 'reply',
-            reply: { id: 'menu:support', title: '💬 Support' },
+            reply: { id: 'menu:live_support', title: '💬 Live Support' },
           },
         ],
       },
     },
   });
+}
+
+export async function sendSupportReply(to: string): Promise<void> {
+  if (config.telegramSupportUrl) {
+    await postMessage({
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'cta_url',
+        body: {
+          text: '💬 *Telegram Support*\n\nFor direct contact, use the button below. You can also start live support here.',
+        },
+        action: {
+          name: 'cta_url',
+          parameters: {
+            display_text: 'Telegram Support',
+            url: config.telegramSupportUrl,
+          },
+        },
+      },
+    });
+  }
+  await sendMenuReply(to, menuReplyTextForSupport());
+}
+
+export async function sendLiveSupportPrompt(to: string): Promise<void> {
+  await sendMenuReply(
+    to,
+    '💬 *Live Support*\n\nPlease describe your issue in your next message. Our support team will continue the conversation here.',
+  );
+}
+
+function menuReplyTextForSupport(): string {
+  return '💬 *Live Support*\n\nTap Live Support and send your issue here. Our team can continue the conversation in this chat.';
 }
