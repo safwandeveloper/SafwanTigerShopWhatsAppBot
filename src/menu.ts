@@ -6,7 +6,6 @@ export const MAIN_MENU_ROWS = [
   { id: 'menu:profile', title: '⚙️ My Account', description: 'Orders, balance & settings' },
   { id: 'menu:support', title: '💬 Support', description: 'Chat with our team' },
   { id: 'menu:ai_support', title: '🥝 Kiwi Ai', description: 'Instant AI assistant' },
-  { id: 'menu:refer', title: '🎁 Refer & Earn', description: 'Invite friends, get rewards' },
   { id: 'menu:channel', title: '📢 Updates Channel', description: 'New stock & announcements' },
 ] as const;
 
@@ -90,7 +89,7 @@ export function menuReplyText(id: string): string | null {
     case 'menu:refer':
       return '🎁 *Refer & Earn*\n\nInvite friends and earn rewards on every purchase.\n_Referral links on WhatsApp are coming soon._';
     case 'menu:channel':
-      return '📢 *Updates Channel*\n\nGet new stock alerts and announcements first:\nhttps://t.me/safwantigerstore';
+      return '📢 *Updates Channel*\n\nStay up to date with new stock alerts, offers, and announcements.\n\nJoin the official channel:\nhttps://t.me/safwantigerstore';
     default:
       return null;
   }
