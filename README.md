@@ -21,7 +21,7 @@ Optional response settings:
 
 - `WHATSAPP_TOPUP_RESPONSE`: admin-editable reply for the “How do I top up?” icebreaker. Update it in Railway Variables and redeploy.
 - `WHATSAPP_TELEGRAM_SUPPORT_URL`: Telegram support URL used by the Support icebreaker.
-- `WHATSAPP_ADMIN_PHONE_NUMBER`: admin WhatsApp number, digits only, for live-support message relay.
+- `WHATSAPP_ADMIN_PHONE_NUMBER`: admin WhatsApp number for live-support relay and `/admin` access. Local Pakistani numbers such as `03276996499` are normalized automatically.
 
 The service listens on `PORT` (default `3000`) and exposes:
 
@@ -70,6 +70,11 @@ Recommended icebreakers are:
 
 Meta stores the icebreaker labels; the bot supplies the responses through the webhook.
 Live support relays one active customer at a time to `WHATSAPP_ADMIN_PHONE_NUMBER`.
+
+The admin can send `/admin` from the configured admin number to open the private
+admin panel. It includes a dashboard, live-support status/close control,
+command reference, and links to the Railway-managed settings. Customer numbers
+cannot open this panel.
 
 ## Commands
 

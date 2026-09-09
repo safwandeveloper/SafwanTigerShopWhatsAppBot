@@ -1,7 +1,13 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
-import { commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
+import { adminMenuId, commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
 import {
+  sendAdminCommands,
+  sendAdminDashboard,
+  sendAdminMenu,
+  sendAdminMoreMenu,
+  sendAdminSettings,
+  sendAdminSupport,
   sendCommandsReply,
   sendLiveSupportPrompt,
   sendMainMenu,
@@ -94,6 +100,11 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         kind: message.kind,
       });
       if (message.kind === 'text') {
+        const adminId = adminMenuId(message.text);
+        if (message.from === config.adminPhoneNumber && adminId === 'admin:main') {
+          await sendAdminMenu(message.from);
+          return;
+        }
         if (message.from === config.adminPhoneNumber && liveSupportUser) {
           await sendTextMessage(liveSupportUser, `💬 *Support*\n\n${message.text}`);
           return;
@@ -146,6 +157,27 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         }
       } else if (message.id === 'menu:main') {
         await sendMainMenu(message.from);
+      } else if (message.from === config.adminPhoneNumber && message.id.startsWith('admin:')) {
+        if (message.id === 'admin:main') {
+          await sendAdminMenu(message.from);
+        } else if (message.id === 'admin:dashboard') {
+          await sendAdminDashboard(message.from, liveSupportUser);
+        } else if (message.id === 'admin:support') {
+          await sendAdminSupport(message.from, liveSupportUser);
+        } else if (message.id === 'admin:more') {
+          await sendAdminMoreMenu(message.from);
+        } else if (message.id === 'admin:settings') {
+          await sendAdminSettings(message.from);
+        } else if (message.id === 'admin:commands') {
+          await sendAdminCommands(message.from);
+        } else if (message.id === 'admin:close_support') {
+          const closedSupportUser = liveSupportUser;
+          liveSupportUser = null;
+          if (closedSupportUser) {
+            await sendTextMessage(closedSupportUser, 'Live Support chat has been closed by the support team.');
+          }
+          await sendAdminSupport(message.from, liveSupportUser);
+        }
       } else {
         const reply = menuReplyText(message.id);
         if (message.id === 'menu:more') {

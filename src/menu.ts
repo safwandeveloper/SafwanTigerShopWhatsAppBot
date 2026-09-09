@@ -38,6 +38,10 @@ export function commandMenuId(text: string): string | null {
   }
 }
 
+export function adminMenuId(text: string): string | null {
+  return text.trim().toLowerCase() === '/admin' ? 'admin:main' : null;
+}
+
 export function icebreakerMenuId(text: string): string | null {
   const normalized = text
     .trim()
