@@ -66,10 +66,57 @@ export async function sendMenuReply(to: string, body: string, buttons?: Array<{ 
       type: 'button',
       header: { type: 'text', text: 'SafwanTiger Shop' },
       body: { text: body },
-      footer: { text: 'Need help? Tap Support anytime.' },
       action: { buttons: safeButtons },
     },
   });
+}
+
+export async function sendAdminMenu(to: string): Promise<void> {
+  await sendMenuReply(to, '*Admin Panel*\n\nChoose an admin section:', [
+    { id: 'admin:dashboard', title: 'Dashboard' },
+    { id: 'admin:support', title: 'Support' },
+    { id: 'admin:more', title: 'More' },
+  ]);
+}
+
+export async function sendAdminMoreMenu(to: string): Promise<void> {
+  await sendMenuReply(to, '*Admin Panel*\n\nMore tools:', [
+    { id: 'admin:settings', title: 'Settings' },
+    { id: 'admin:commands', title: 'Commands' },
+    { id: 'admin:main', title: 'Back' },
+  ]);
+}
+
+export async function sendAdminDashboard(to: string, activeSupportUser: string | null): Promise<void> {
+  const supportStatus = activeSupportUser ? 'Active customer support chat' : 'No active support chat';
+  await sendMenuReply(to, `*Dashboard*\n\n${supportStatus}\n\nWhatsApp menu: active\nTop-up response: configured\nTelegram support link: ${config.telegramSupportUrl ? 'configured' : 'not configured'}`, [
+    { id: 'admin:support', title: 'Support' },
+    { id: 'admin:settings', title: 'Settings' },
+    { id: 'admin:main', title: 'Back' },
+  ]);
+}
+
+export async function sendAdminSupport(to: string, activeSupportUser: string | null): Promise<void> {
+  const status = activeSupportUser
+    ? 'One customer is currently connected to live support.'
+    : 'No customer is currently connected to live support.';
+  await sendMenuReply(to, `*Support*\n\n${status}`, [
+    { id: 'admin:close_support', title: 'Close Chat' },
+    { id: 'admin:main', title: 'Back' },
+  ]);
+}
+
+export async function sendAdminSettings(to: string): Promise<void> {
+  await sendMenuReply(to, '*Admin Settings*\n\nTop-up response is controlled by WHATSAPP_TOPUP_RESPONSE in Railway Variables.\n\nSupport URL is controlled by WHATSAPP_TELEGRAM_SUPPORT_URL.\n\nAfter changing either value, redeploy the WhatsApp service.', [
+    { id: 'admin:commands', title: 'Commands' },
+    { id: 'admin:main', title: 'Back' },
+  ]);
+}
+
+export async function sendAdminCommands(to: string): Promise<void> {
+  await sendMenuReply(to, '*Commands*\n\n/admin — Open this admin panel\n/start — Open the customer menu\n/products — Browse products\n/deposit — Add wallet funds\n/settings — Open customer settings\n/support — Get help', [
+    { id: 'admin:main', title: 'Back' },
+  ]);
 }
 
 export async function sendCommandsReply(to: string, body: string): Promise<void> {
