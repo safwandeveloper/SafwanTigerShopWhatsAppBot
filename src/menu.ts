@@ -46,12 +46,14 @@ export function icebreakerMenuId(text: string): string | null {
     .replace(/\s+/g, ' ');
   switch (normalized) {
     case 'show commands':
+    case 'show me commands':
       return 'menu:commands';
     case 'what can this bot do':
     case 'what this bot can':
     case 'which purpose is this bot':
       return 'menu:purpose';
     case 'browse products':
+    case 'show me products':
       return 'menu:shop';
     case 'how do i topup':
     case 'how do i top up':
