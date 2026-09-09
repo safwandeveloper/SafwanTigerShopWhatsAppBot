@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from './config.js';
 import { commandMenuId, icebreakerMenuId, menuReplyText } from './menu.js';
 import {
+  sendCommandsReply,
   sendLiveSupportPrompt,
   sendMainMenu,
   sendMenuReply,
@@ -135,6 +136,8 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
           await sendMainMenu(message.from);
         } else if (id === 'menu:support') {
           await sendSupportReply(message.from);
+        } else if (id === 'menu:commands') {
+          await sendCommandsReply(message.from, reply);
         } else {
           await sendMenuReply(message.from, reply);
         }
@@ -144,6 +147,8 @@ export async function handleWebhook(req: IncomingMessage, res: ServerResponse): 
         const reply = menuReplyText(message.id);
         if (message.id === 'menu:support') {
           await sendSupportReply(message.from);
+        } else if (message.id === 'menu:commands' && reply) {
+          await sendCommandsReply(message.from, reply);
         } else if (reply) {
           await sendMenuReply(message.from, reply);
         } else {
