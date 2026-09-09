@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import type { AdminData } from './data.js';
+import type { AdminData, CustomerRow, MenuView, OrderRow, DepositRow } from './data.js';
 
 async function postMessage(payload: Record<string, unknown>): Promise<void> {
   if (!config.accessToken || !config.phoneNumberId) {
@@ -37,12 +37,83 @@ export async function sendTextMessage(to: string, body: string): Promise<void> {
   });
 }
 
-export async function sendMainMenu(to: string): Promise<void> {
+export async function sendMainMenu(to: string, menuView: MenuView = 'buttons'): Promise<void> {
+  if (menuView === 'list') {
+    await postMessage({
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        header: { type: 'text', text: 'SafwanTiger Shop' },
+        body: { text: '*Welcome to SafwanTiger Shop!*\n\nChoose an option below.' },
+        action: {
+          button: 'Open Menu',
+          sections: [
+            {
+              title: 'Store',
+              rows: [
+                { id: 'menu:shop', title: 'Shop', description: 'Browse products & offers' },
+                { id: 'menu:topup', title: 'Top-up Wallet', description: 'Add balance securely' },
+                { id: 'menu:profile', title: 'Settings', description: 'Orders, deposits & account' },
+              ],
+            },
+            {
+              title: 'Help & More',
+              rows: [
+                { id: 'menu:support', title: 'Support', description: 'Chat with our team' },
+                { id: 'menu:ai_support', title: 'Kiwi Ai', description: 'Instant AI assistant' },
+                { id: 'menu:refer', title: 'Refer & Earn', description: 'Invite friends, get rewards' },
+                { id: 'menu:channel', title: 'Updates Channel', description: 'New stock & announcements' },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    return;
+  }
   await sendMenuReply(to, '*Welcome to SafwanTiger Shop!*\n\nYour wallet balance is available in Settings.', [
     { id: 'menu:shop', title: 'Shop' },
     { id: 'menu:topup', title: 'Top-up' },
     { id: 'menu:more', title: 'More' },
   ]);
+}
+
+export async function sendSettingsMenu(to: string, customer: CustomerRow | null): Promise<void> {
+  const profile = customer?.display_name || 'WhatsApp customer';
+  const balance = customer?.balance ?? 0;
+  const joined = customer ? new Date(customer.created_at).toISOString().slice(0, 10) : 'Not recorded';
+  await sendMenuReply(to, `*Settings*\n\n*Profile*\n${profile}\n\n*Wallet*\nBalance: ${balance}\n\n*Joined*\n${joined}\n\nChoose what you want to view:`, [
+    { id: 'settings:orders', title: 'Order History' },
+    { id: 'settings:deposits', title: 'Deposit History' },
+    { id: 'settings:view', title: 'Menu View' },
+  ]);
+}
+
+export async function sendMenuViewMenu(to: string, current: MenuView): Promise<void> {
+  await sendMenuReply(to, `*Menu View*\n\nCurrent view: ${current === 'list' ? 'List menu' : 'Compact buttons'}\n\nChoose your preferred WhatsApp menu style:`, [
+    { id: 'settings:view:buttons', title: 'Compact Buttons' },
+    { id: 'settings:view:list', title: 'List Menu' },
+    { id: 'menu:profile', title: 'Back' },
+  ]);
+}
+
+function formatHistoryDate(value: string): string {
+  return new Date(value).toISOString().slice(0, 10);
+}
+
+export async function sendOrderHistory(to: string, rows: OrderRow[]): Promise<void> {
+  const body = rows.length
+    ? `*Order History*\n\n${rows.map((row) => `• ${row.product_name}\n  ${row.amount} — ${row.status} — ${formatHistoryDate(row.created_at)}`).join('\n')}`
+    : '*Order History*\n\nNo orders recorded yet.';
+  await sendMenuReply(to, body, [{ id: 'menu:profile', title: 'Back' }]);
+}
+
+export async function sendDepositHistory(to: string, rows: DepositRow[]): Promise<void> {
+  const body = rows.length
+    ? `*Deposit History*\n\n${rows.map((row) => `• ${row.amount}\n  ${row.status}${row.reference ? ` — ${row.reference}` : ''} — ${formatHistoryDate(row.created_at)}`).join('\n')}`
+    : '*Deposit History*\n\nNo deposits recorded yet.';
+  await sendMenuReply(to, body, [{ id: 'menu:profile', title: 'Back' }]);
 }
 
 export async function sendMoreMenu(to: string): Promise<void> {

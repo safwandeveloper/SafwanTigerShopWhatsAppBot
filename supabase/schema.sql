@@ -2,6 +2,7 @@ create table if not exists public.whatsapp_customers (
   phone_number text primary key,
   display_name text,
   balance numeric(18, 2) not null default 0,
+  menu_view text not null default 'buttons' check (menu_view in ('buttons', 'list')),
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now()
 );
@@ -27,3 +28,13 @@ create table if not exists public.whatsapp_deposits (
 alter table public.whatsapp_customers enable row level security;
 alter table public.whatsapp_orders enable row level security;
 alter table public.whatsapp_deposits enable row level security;
+
+alter table public.whatsapp_customers
+  add column if not exists menu_view text not null default 'buttons';
+
+alter table public.whatsapp_customers
+  drop constraint if exists whatsapp_customers_menu_view_check;
+
+alter table public.whatsapp_customers
+  add constraint whatsapp_customers_menu_view_check
+  check (menu_view in ('buttons', 'list'));
