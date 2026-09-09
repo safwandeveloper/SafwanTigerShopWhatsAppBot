@@ -22,6 +22,8 @@ Optional response settings:
 - `WHATSAPP_TOPUP_RESPONSE`: admin-editable reply for the “How do I top up?” icebreaker. Update it in Railway Variables and redeploy.
 - `WHATSAPP_TELEGRAM_SUPPORT_URL`: Telegram support URL used by the Support icebreaker.
 - `WHATSAPP_ADMIN_PHONE_NUMBER`: admin WhatsApp number for live-support relay and `/admin` access. Local Pakistani numbers such as `03276996499` are normalized automatically.
+- `WHATSAPP_SUPABASE_URL`: URL of the separate Supabase project used only by the WhatsApp bot.
+- `WHATSAPP_SUPABASE_SERVICE_ROLE_KEY`: service-role key for that separate Supabase project. Keep it only in Railway Variables.
 
 The service listens on `PORT` (default `3000`) and exposes:
 
@@ -75,6 +77,10 @@ The admin can send `/admin` from the configured admin number to open the private
 admin panel. It includes a dashboard, live-support status/close control,
 command reference, and links to the Railway-managed settings. Customer numbers
 cannot open this panel.
+
+Run `supabase/schema.sql` in the separate WhatsApp Supabase project's SQL
+editor. The admin panel then exposes recent customers, orders, and deposits;
+the Telegram Supabase project is never queried.
 
 ## Commands
 
